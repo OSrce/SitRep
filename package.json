@@ -1,0 +1,9 @@
+{
+  "name":"node_base_project",
+  "description":"Base Node Proejct webserver with openid",
+  "version":"0.0.1",
+  "dependencies": {
+    "express":"3.x"
+
+  }
+}
