@@ -1,0 +1,289 @@
+
+/* Base View Style */
+
+.view {
+	background-color:black;
+	border:0px;
+	margin:0px;
+	padding:0px;
+}
+
+
+/* Layer Tree View Type Style */
+.layertree {
+	background-color: white;
+	
+}
+
+/* Grid View Type Style */
+.grid {
+	background-color: white;
+	overflow: auto;
+}
+
+
+.srdLoginImage {
+	width:80px;
+	height:80px;
+}
+
+#rightLoginImage {
+	float:right;
+}
+
+#leftLoginImage {
+	float:left;
+	height:90px;
+}
+
+
+.srdMenuBar.dijitMenuItem {
+	padding:0px;
+	height:23px;
+}
+
+
+.srdLayoutImage {
+	width:50px;
+	height:50px;
+}
+
+#srdLayoutText {
+	display:inline;
+	position:relative;
+	bottom:10px;
+}
+
+.srdLayoutName.dijitContentPane {
+	text-align:center;
+	background-color: gray;
+	font-size:48px;
+	height:50px;
+	width:100%;
+	margin:0px;
+	padding:0px;
+	border:0px;
+}
+
+#widget_srsearch {
+
+}
+
+#srdLogout {
+	position:absolute;
+	right:5px;
+
+}
+
+
+.srdViewOutside.dijitBorderContainer {
+	width: 100%;
+	height: 100%;
+	background-color: black;
+	margin:0px;
+	padding:0px;
+	border:0px;
+}
+
+
+.srdViewInside.dijitBorderContainer  {
+	margin:3px;
+	padding:0;
+	border:0;
+	line-height:normal;
+	color: black;
+	background-color: black;
+}
+
+
+
+.srd_cfs_single {
+	background-color: white;
+	color: black;
+	font-size: 12pt;
+	min-width: 600px;
+	min-height: 400px;
+	width: 100%;
+/*	height: 100%;*/
+	height: inherit;
+
+	overflow:auto;
+}
+
+.srd_cfs_row0 {
+	position: absolute;
+	top: 10px;
+	clear: both;
+}
+
+.srd_cfs_row1 {
+	position: absolute;
+	top: 120px;
+	left: 10px;
+	clear: both;
+}
+
+.srd_cfs_row2 {
+	position: absolute;
+	top: 150px;
+}
+
+.srd_cfs_row3 {
+	position: absolute;
+	top: 180px;
+}
+
+.srd_cfs_row4 {
+	position: absolute;
+	top: 210px;
+}
+
+.srd_cfs_row5 {
+	position: absolute;
+	top: 240px;
+}
+
+.srd_cfs_row6 {
+	position: absolute;
+	top: 270px;
+}
+
+#srd_cfs_title {
+	position: relative;
+	text-align: center;
+	margin-left:auto;
+	margin-right:auto;
+	font-size:24px;
+	font-weight:bold;
+}
+
+#srd_cfs_leftImage {
+	position: absolute;
+	left: 20px;
+}
+
+#srd_cfs_rightImage {
+	position: absolute;
+	right: 20px;
+}
+
+
+
+#label_cfs_date {
+	left: 10px;
+}	
+#widget_cfs_date {
+	left: 60px;
+	width: 95px;
+}
+#label_cfs_timecreated {
+	left: 10px;
+}
+#cfs_timecreated {
+	left: 60px;
+}
+
+#label_cfs_timeassigned {
+	left: 10px;
+}
+
+#cfs_timeassigned {
+	left: 85px;
+}
+
+#label_cfs_num {
+	left: 200px;
+}
+#cfs_num {
+	left: 250px;
+	width: 81px;
+	height: 15px;
+}
+#label_cfs_updated_on {
+	left: 350px;
+}
+#cfs_updated_on {
+	left: 420px;
+}
+
+#label_cfs_code {
+	left: 300px;
+}
+#cfs_code {
+	left: 350px;
+}
+
+#cfs_codesup1 {
+	left: 400px;
+}
+
+#label_cfs_pct {
+	left: 150px;
+}
+#cfs_pct {
+	left: 220px;
+}
+
+
+#cfs_codesup2 {
+	left: 480px;
+}
+
+
+#label_cfs_addr {
+	left: 10px;
+}
+#cfs_addr {
+	left: 80px;
+}
+#label_cfs_cross1 {
+	left: 240px;
+}
+#cfs_cross1 {
+	left: 290px;
+}
+#label_cfs_cross2 {
+	left: 450px;
+}
+#cfs_cross2 {
+	left: 500px;
+}
+
+#label_cfs_finaldisdate {
+	left: 10px;
+}
+#cfs_finaldisdate {
+	left: 85px;
+}
+#label_cfs_finaldisunit {
+	left: 150px;
+}
+#cfs_finaldisunit {
+	left: 190px;
+}
+#label_cfs_finaldis {
+	left: 300px;
+}
+#cfs_finaldis {
+	left: 340px;
+}
+#cfs_finaldissup1 {
+	left: 390px;
+}
+#label_cfs_dupnum {
+	left: 450px;
+}
+#cfs_dupnum {
+	left: 490px;
+}
+
+
+#cfs_body {
+	left: 10px;
+	width: 590px;
+	overflow: static;
+}
+
+
+
+

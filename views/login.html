@@ -1,0 +1,35 @@
+<!DOCTYPE HTML SYSTEM "about:legacy-compat">
+<html><head><meta content="text/html; charset=UTF-8" http-equiv="Content-Type" /><meta content="IE=8" http-equiv="X-UA-Compatible" /><link href="/resources/dijit/themes/tundra/tundra.css" type="text/css" rel="stylesheet" /><link href="/resources/styles/standard.css" media="screen" type="text/css" rel="stylesheet" /><link href="/resources/images/favicon.ico" rel="SHORTCUT ICON" /><script type="text/javascript">var djConfig = {parseOnLoad: false, isDebug: false, locale: 'en-us'};</script><script type="text/javascript" src="/resources/dojo/dojo.js"></script><script type="text/javascript" src="/resources/spring/Spring.js"></script><script type="text/javascript" src="/resources/spring/Spring-Dojo.js"></script><script type="text/javascript" language="JavaScript">dojo.require("dojo.parser");</script><title>Welcome to SitRep</title><style>
+    body
+        {
+                background-image:url('/lib/img/sitrep_login_restrictive.png');
+                      background-color:#000000;
+                            background-size:cover;
+                                }
+                                    
+                                    .srlogin {
+                                            background-color:transparent;
+                                                  position:absolute;
+                                                        top:30%;
+                                                              left:30%;
+                                                                    
+                                                                  }
+                                                                      
+                                                                      
+                                                                      
+                                                                      </style></head><body class="tundra spring"><div id="wrapper"><div id="main"><div version="2.0"><form method="POST" action="/resources/j_spring_security_check" name="f" class="srlogin"><img src="/lib/img/SitRepIcon_Small.png" /><div><label style="color:#FFFFFF;position:absolute;top:3.2em;left:12em;" for="j_username">
+                                                                                        USERNAME
+                                                                                                </label><input style="width:150px; border-radius: 0.5em;position:absolute;top:3em;left:22em;" name="j_username" type="text" id="j_username" /><script type="text/javascript">
+          Spring.addDecoration(new Spring.ElementDecoration({elementId : "j_username", widgetType : "dijit.form.ValidationTextBox", widgetAttrs : {promptMessage: "Enter your name", required : true}})); 
+                  </script></div><br /><div><label style="color:#FFFFFF;position:absolute;top:6.2em;left:12em;" for="j_password">
+                                PASSWORD
+                                        </label><input style="width:150px; border-radius: 0.5em;position:absolute;top:6em;left:22em;" name="j_password" type="password" id="j_password" /><script type="text/javascript">
+          Spring.addDecoration(new Spring.ElementDecoration({elementId : "j_password", widgetType : "dijit.form.ValidationTextBox", widgetAttrs : {promptMessage: "Enter your password", required : true}})); 
+                  </script></div><br /><div class="submit"><script type="text/javascript">Spring.addDecoration(new Spring.ValidateAllDecoration({elementId:'proceed', event:'onclick'}));</script><input style="visibility: hidden;" value="Submit" type="submit" id="proceed" /><input style="visibility: hidden;" value="Reset" type="reset" id="reset" /></div><input style="visibility: hidden;" checked="checked" value="on" name="_spring_security_remember_me" type="checkbox" /></form></div></div></div></body></html>
+                                    }
+        }
+
+
+
+
+

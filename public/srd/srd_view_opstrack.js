@@ -1,0 +1,550 @@
+// srd_view_opstrack.js
+////////////////////////////////
+// srd view admin
+//
+//
+//
+//
+//
+/////////////////////////////////
+define([
+	"dojo/_base/declare",
+	"srd/srd_view",
+	"srd/srd_layer",
+	'dojo/store/Observable',
+	'dojox/timing',
+	"dojo/store/JsonRest",
+	"dojo/store/Cache",
+	"dojo/data/ObjectStore"
+], function (declare, srd_view, srd_layer, Observable) {
+
+//srd_view class definition using dojo.declare 
+return declare( 
+	"srd_view_opstrack",
+	[srd_view] ,
+	{
+		type:'opstrack',
+		srd_queryArr : null,
+		srd_layerArr : null,
+		srd_selLayer : null,
+		srd_store		 : null,
+		srd_dataStore		 : null,
+		srd_datagrid : null,
+		srd_mapModes : {
+			"Precinct" : 1,
+			"Sector"   : 2,
+			"Address"  : 3
+		},	
+		srd_selMapMode : 3,
+
+		//CONSTUCTOR - REMEMBER SUPER CONSTRUCTOR GETS CALLED FIRST!
+		constructor : function( view_data, parent_srd_doc) {
+			dojo.addOnLoad( function() {
+			console.log("srd_view_ops constructor called!");
+			this.srd_queryArr = this.srd_doc.srd_queryArr;
+			this.srd_layerArr = this.srd_doc.srd_layerArr;
+			this.srd_selLayer = this.srd_doc.srd_selLayer;
+//				console.log("Selected Layer : "+this.srd_selLayer.name);
+				// DEFINE ALL THE DIFFERENT TABLE WE CAN CONNECT TO:
+				this.tableList = {
+					"Calls for service - SPRINT" : "/srcfses/"
+				};
+				
+				this.selectedTable = "Calls for service - SPRINT";
+				this.selectedDataMenu = new dijit.Menu();
+//				if(this.data.autoRefresh) {
+//					this.autoRefresh = this.data.autoRefresh;
+//				}
+				if(!this.autoRefresh) {
+					this.autoRefresh = false;				
+				}
+				if(this.data.mapData) {
+					this.mapData = this.data.mapData;
+				}
+				if(!this.mapData) {
+					this.mapData = false;			
+				}
+				for( var tmpTable in this.tableList) {
+					console.log("Table Type:"+tmpTable);
+					this.selectedDataMenu.addChild( new dijit.MenuItem( {
+						label: tmpTable,
+						value: this.tableList[tmpTable],
+						srd_view: this,
+						onClick: function() { this.srd_view.selectTable(this.label); }
+					} ) );	
+				}
+				this.dataMenu.addChild(new dijit.PopupMenuItem( {
+					label: "Selected Table: ",
+					popup: this.selectedDataMenu
+				} ) );
+				this.dataMenu.addChild(new dijit.MenuItem( {
+					label: "Upload Changes",
+					srd_view: this,
+					onClick: function() { this.srd_view.srd_dataStore.save(); } 
+				} ) );
+				this.dataMenu.addChild(new dijit.MenuItem( {
+					label: "Create New Item",
+					srd_view: this,
+					onClick: function() { this.srd_view.createItem(); } 
+				} ) );
+				this.dataMenu.addChild(new dijit.MenuItem( {
+					label: "Delete Selected",
+					srd_view: this,
+					onClick: function() { this.srd_view.deleteSelectedItems(); } 
+				} ) );
+				this.selectedQueryMenu = new dijit.Menu();
+				for( var theQueryId in this.srd_queryArr) {
+					this.selectedQueryMenu.addChild( new dijit.MenuItem( {
+						label: this.srd_queryArr[theQueryId].name+" : "+this.srd_queryArr[theQueryId].notes,
+						value: theQueryId,
+						srd_view: this,
+						onClick: function() { this.srd_view.changeQuery(this.value); }
+					} ) );
+				}
+				var changeQueryMenuItem = new dijit.PopupMenuItem( {
+					label: "Change Query: ",
+					popup: this.selectedQueryMenu
+				} );
+				this.dataMenu.addChild(changeQueryMenuItem);
+				var autoRefreshMenuItem = new dijit.CheckedMenuItem( {
+					label: "Auto Refresh",
+					srd_view: this,
+//					checked: this.autoRefresh,
+					onClick: function() { this.srd_view.toggleAutoRefresh(this); } 
+				} );
+				this.dataMenu.addChild(autoRefreshMenuItem);
+//				if(this.autoRefresh == true) {
+//					this.toggleAutoRefresh(autoRefreshMenuItem);
+//				}
+				var mapDataMenuItem = new dijit.CheckedMenuItem( {
+					label: "Map Data",
+					srd_view: this,
+					checked: this.mapData,
+					onClick: function() { this.srd_view.toggleMapData(this); } 
+				} );
+				this.dataMenu.addChild(mapDataMenuItem);
+//				this.srd_memStore = new dojo.store.Memory();			
+				this.srd_memStore = Observable( new dojo.store.Memory() );			
+				this.srd_store = new this.FixedCacheStore(
+					dojo.store.JsonRest({ 
+						idProperty: "id",
+//						queryEngine: dojo.store.util.SimpleQueryEngine,
+						target: this.tableList[this.selectedTable]
+					} ),
+					this.srd_memStore
+				);
+				var gridCellsDijit = dojox.grid.cells;
+				this.srd_structList = { 
+					"Calls for service - SPRINT": [ {
+						defaultCell: { width: 10, editable: false, cellStyles: 'text-align: center;'  },
+						cells: [
+							{ name: "Date", field:"cfs_date", width: "120px", hidden:true },
+							{ name: "Time", field:"cfs_timecreated", width: "90px", formatter:this.dateToTime},
+//							{ name: "Job Let", field:"cfs_letter", width: "50px" },
+							{ name: "Signal", field:"cfs_code", width: "90px", formatter: this.formatSignal},
+							{ name: "Signal Info1", field:"cfs_codesup1", width: "50px" },
+							{ name: "Signal Info2", field:"cfs_codesup2", width: "150px" },
+							{ name: "Job #", field:"cfs_num", width: "90px" },
+							{ name: "Precinct", field:"cfs_pct", width: "50px" },
+							{ name: "Sector", field:"cfs_sector", width: "50px" },
+							{ name: "Address", field:"cfs_addr", width: "250px" },
+							{ name: "Cross St 1", field:"cfs_cross1", width: "150px" },
+							{ name: "Cross St 2", field:"cfs_cross2", width: "150px" },
+						{ name: "Time Assigned", field:"cfs_timeassigned", width: "100px",  formatter: this.dateToTime },
+							{ name: "Unit Assigned", field:"cfs_assignedunit", width: "100px" },
+							{ name: "Priority", field:"cfs_priority", width: "50px" },
+							{ name: "Final Disposition", field:"cfs_finaldis", width: "90px", formatter:function(data) {
+									if(data) { return "10-"+data; } else { return ''; } }
+						  },
+							{ name: "Final Disposition Info", field:"cfs_finaldissup1", width: "150px" },
+							{ name: "Final Disposition Date/Time", field:"cfs_finaldisdate", width: "150px", formatter:this.dateToTime},
+							{ name: "Final Disposition Unit", field:"cfs_finaldisunit", width: "50px" },
+							{ name: "Job is Duplicate", field:"cfs_dup", width: "50px", hidden:true},
+							{ name: "Last Updated From SPRINT", field:"cfs_updated_on", width: "150px" , formatter:this.dateToTime}
+
+//							{ name: "Body of Job", field:"cfs_body", width: "250px" }
+							]
+					} ]
+					
+				};
+
+				// Make Query Results from memstore here and observe handler.
+				this.theResults = this.srd_memStore.query();
+				this.observeHandle = this.theResults.observe(function(object,removedFrom,insertedInto) { this.resultsObserver(object, removedFrom, insertedInto); }.bind(this)  );
+
+				this.srd_sort = [{attribute:'cfs_finaldisdate', descending:true},{attribute:'cfs_timecreated', descending:true}];
+				this.srd_dataStore = new dojo.data.ObjectStore( { objectStore: this.srd_store } );
+
+				// CHECK TO SEE IF srd_queryid is set and if so, get QUERY FROM queryArr
+				if(this.data.srd_queryid && this.srd_queryArr[this.data.srd_queryid]) {
+					if(this.srd_queryArr[this.data.srd_queryid].data) {
+						this.data.srd_query = dojo.fromJson(this.srd_queryArr[this.data.srd_queryid].data);
+					}
+				}
+	
+				if(this.data.srd_query) {
+					this.srd_query = this.data.srd_query;
+				} else {
+					this.srd_query = { SREXPR: "( cfs_finaldis IS NULL OR cfs_finaldisdate >= current_timestamp - interval '15 minutes' ) AND cfs_routenotifications = 'true'" }; 
+				}
+				this.srd_datagrid = new dojox.grid.EnhancedGrid( {
+					store: this.srd_dataStore,
+					structure : this.srd_structList[this.selectedTable],
+					plugins: {nestedSorting: true, pagination: false},
+					sortFields: this.srd_sort,
+					query: this.srd_query,
+					selectable: true,
+					region : 'center'
+				} );
+//				this.srd_datagrid.setQuery(this.srd_query ); 
+
+				this.insideContainer.addChild(this.srd_datagrid);
+				dojo.connect(this.srd_datagrid, 'onRowDblClick', this, 'popupCfsSingle');
+				this.srd_doc.srd_dataMenuPopup.set('popup',this.dataMenu );
+				this.onLoad();
+			}.bind(this) );		
+		},
+		// END constructor
+		deleteSelectedItems: function() {
+			var items = this.srd_datagrid.selection.getSelected();
+			if(items.length) {
+				dojo.forEach(items,function(selectedItem) {
+					if(selectedItem !== null) {
+						this.srd_dataStore.deleteItem(selectedItem);
+					}
+				}.bind(this) );
+			}
+		},
+		createItem: function() {
+			var item = {'id': 0 };
+			this.srd_dataStore.newItem(item);
+		},
+		selectTable: function( selTable) {
+			if(this.selectedTable != selTable) {
+			console.log( "Selected Table called: "+selTable);	
+				this.selectedTable = selTable;
+				delete this.srd_datagrid;
+				delete this.srd_dataStore;
+				delete this.srd_store;
+				this.srd_store = new this.FixedCacheStore(
+					dojo.store.JsonRest({ 
+						target: this.tableList[this.selectedTable]
+					} ),
+					dojo.store.Memory() 
+				);
+				this.srd_dataStore = new dojo.data.ObjectStore( { objectStore: this.srd_store } );
+				this.srd_datagrid = new dojox.grid.EnhancedGrid( {
+					store: this.srd_dataStore,
+					structure : this.srd_structList[this.selectedTable],
+					plugins: {nestedSorting: true, pagination: false},
+					selectable: true,
+					region : 'center'
+				} );
+
+				// Make Query Results from memstore here and observe handler.
+				this.theResults = this.srd_memStore.query();
+				this.observeHandle = this.theResults.observe(this.resultsObserver(object, removedFrom, insertedInto) );
+
+				this.insideContainer.addChild(this.srd_datagrid);
+				//TODO FIX THIS - IT DOES NOT WORK!!!!
+				dojo.connect(this.srd_datagrid, 'onRowDblClick', this, 'popupCfsSingle');
+			}
+		},
+		// END selectTable FUNCTION
+		toggleAutoRefresh: function(menuItem) { 
+			if( menuItem.checked == true ) {
+				this.srd_timer = new dojox.timing.Timer(15000);
+				this.srd_timer.onTick = function() { this.refreshTable();
+					}.bind(this);				
+				this.srd_timer.start();	
+				this.autoRefresh = true;
+				// TODO : this policy should be set from srd_document and then
+				// pushed down to each view (not the other way arround)
+				if( this.srd_doc.staticVals != null) {
+					this.srd_doc.staticVals.autoRefresh = true;
+					this.srd_doc.toggleAutoRefresh();
+				}
+			} else {
+				this.srd_timer.stop();	
+				this.autoRefresh = false;
+				if( this.srd_doc.staticVals != null) {
+					this.srd_doc.staticVals.autoRefresh = false;
+					this.srd_doc.toggleAutoRefresh();
+				}
+			}
+		},
+		// END toggleAutoRefresh
+		// BEGIN toggleMapData 
+		toggleMapData: function(menuItem) { 
+			console.log("TOGGLE MAP DATA CALLED!");
+			if( menuItem.checked == true ) {
+				//CHECKED
+				this.mapData = true;
+				this.drawMapData();
+			} else {
+				//UNCHECKED
+				this.mapData = false;
+				this.srd_layer.layer.destroy();
+				delete this.srd_layer;
+			}
+		},
+		// END toggleMapData
+		drawMapData: function() {
+			dojo.ready(  function() {
+			console.log("Adding OpsTrack to Map");
+			var theOptions = {
+				name: 'OpsTrack',
+				id:'-1',
+				isBaseLayer: false,
+				visibility: true,
+				layerType: "Vector",
+				layerFormat: "NONE"	
+			};
+			this.srd_layer = new srd_layer();
+			this.srd_layer.options = theOptions;
+			this.srd_layer.srd_styleArr = this.srd_doc.srd_styleArr;
+			this.srd_layer.srd_styleMap = this.srd_layer.srd_styleArr["5001"];
+			this.srd_layer.loadData();
+			console.log("Calling for loop TEST5");
+			// NEED TO FIX TODO:::
+			for(var tmpId in this.data.linkViewArr) {
+				if( this.data.linkViewArr[tmpId].data.type == 'map') {
+					this.srd_layer.addLayerToMap(this.data.linkViewArr[tmpId].map);
+				}
+			}
+			console.log("Calling srd_view_opstrack createMapFeatures");
+			this.createMapFeatures();
+			}.bind(this) );
+		},
+		//END DRAW MAP DATA
+		createMapFeatures: function() {
+			this.srd_memStore.query().forEach( function( cfs) {
+				this.addToMap(cfs);
+			}.bind(this) );
+		},
+		// END CREATE MAP FEATURES
+		refreshTable: function() {
+				this.srd_store.query(this.srd_query,{ sort:this.srd_sort } );
+		},
+		// END refreshTable
+		
+		// BEGIN resultsObserver
+		resultsObserver: function(object, removedFrom, insertedInto) {
+//			console.log("Observer Called! "+object.id+" rf: "+removedFrom+" iI: "+insertedInto);
+			if(removedFrom > -1) {
+//				console.log("Remove Pos "+removedFrom+"From DataGrid!");
+				this.srd_dataStore.onDelete(object);
+				if(this.mapData == true) {
+					this.deleteFromMap(object);
+				}
+			} else if(insertedInto > -1) {
+				var theIndex = this.srd_memStore.data.indexOf(object);
+//				console.log( "onNew :"+object.id+" : Index : "+theIndex);
+/*				if(theIndex >= 0 && theIndex != insertedInto) {
+					console.log("testing");					
+//					this.srd_dataStore.onNew(object,theIndex);
+//					this.srd_datagrid._clearData();
+					this.srd_datagrid._addItem(object,theIndex);
+					this.srd_datagrid.updateRows(0, insertedInto);
+//						this.srd_datagrid.update();
+				} else {
+*/
+					this.srd_dataStore.onNew(object,insertedInto);
+					if(this.mapData == true) {
+						this.addToMap(object);
+					}
+//				}
+			} else {
+				this.srd_dataStore.onSet(object);
+			}	
+			
+		},
+		//  END resultsObserver
+		// TEMP FIX <- supposed to be fixed in 1.8 see ticket 14704
+		FixedCacheStore: function(masterStore, cachingStore, options) {
+			var store = dojo.store.Cache( masterStore, cachingStore, options);
+			store.options = options || {};
+			store.add = function(object, options) {
+				return Deferred.when(masterStore.add(object, directives), function(result) {
+					console.log( "ADD Called on FixedCache");
+					cachingStore.add(typeof result == "object" ? result	: object, options);
+					return result;
+				} );
+			};
+			store.put = function(object, options) {
+				cachingStore.remove((options && options.id) || this.getIdentity(object));
+				return Deferred.when(masterStore.put(object, options), function(result) {
+					console.log( "PUT Called on FixedCache");
+					cachingStore.put(typeof result == "object" ? result	: object, options);
+					return result;
+				} );
+			};
+			store.query = function(query, directives) {
+				directives.doNotEvictList = [];
+				var results = masterStore.query(query, directives);
+				results.then(function(objects) {
+//TEST
+					var cacheResults = cachingStore.query();
+					cacheResults.forEach(function(object) {
+						cachingStore.remove(object.id);
+					} );
+//END TEST
+					dojo.forEach(objects, function(object, i) {
+						if(!store.options.isLoaded || store.options.isLoaded(object) ) {
+							if( ! cachingStore.get(object.id)  ) {
+//								console.log("Adding Object to Cache Store:"+i+" :"+object.id);
+//								cachingStore.data.splice(i,0,object);
+//								cachingStore.index[object.id] = object;
+//								cachingStore.notify(object);
+								cachingStore.add(object);
+
+							} else {
+								cachingStore.put(object,store.options);
+							}							
+// MAKE DO NOT EVICT LIST THEN ITERATE THROUGH cacheStore checking what to evict.
+							directives.doNotEvictList.push(object.id);
+//							console.log("MasterStore Result:"+object.id);
+						}
+					} );
+					var cacheResults = cachingStore.query();
+					cacheResults.forEach(function(object) {
+//						console.log("CacheStore Result:"+object.id+"dNEL Length:"+directives.doNotEvictList.indexOf(object.id));
+						if( directives.doNotEvictList.indexOf(object.id) == -1 ) {  
+//							console.log("Evicting :"+object.id);
+							cachingStore.remove(object.id);
+						} 
+					} );
+				} );
+				return dojo.store.util.QueryResults(this.queryEngine(query,directives)(results) );
+			};
+		return store;
+		},
+		// END FixedCacheStore
+		// BEGIN deleteFromMap
+		deleteFromMap: function(object) {
+			if(this.srd_layer) {
+				var theFeatArr = this.srd_layer.layer.getFeaturesByAttribute('cfs',object);
+				if(theFeatArr) {
+					this.srd_layer.layer.removeFeatures(theFeatArr);	
+				}
+			}
+		},
+		// END deleteFromMap
+		// BEGIN addToMap
+		addToMap: function(cfs) {
+			if(this.srd_layer) {
+			if(this.srd_selMapMode == 1) {
+				// USE PCT BOUNDARIES
+				var pct = cfs.cfs_pct;
+				var jobNum = cfs.cfs_num;
+				var searchVal = String(pct);
+				var theRefFeat = this.srd_layerArr[2001].layer.getFeaturesByAttribute('PctName',searchVal);
+				console.log("Create Feature for Job:"+jobNum+" in :"+searchVal);
+				if(theRefFeat && theRefFeat.length > 0) {
+					console.log("Adding Feature to Vector Layer!");
+					var theFeatureAttr = { 
+						label: cfs.cfs_code,
+						body : "Signal: "+cfs.cfs_code+" Job :"+cfs.cfs_num,
+						sr_status: "Open-Unassigned"
+					};
+					var theFeat = new OpenLayers.Feature.Vector(theRefFeat[0].geometry,theFeatureAttr,null);
+					this.srd_layer.layer.addFeatures( Array( theFeat), {});
+				}
+			} else if(this.srd_selMapMode == 2) {
+				// USE SECTOR BOUNDARIES
+				var pct = cfs.cfs_pct;
+				var jobNum = cfs.cfs_num;
+				var sector = cfs.cfs_sector;
+				var searchVal = pct+sector;
+				var theRefFeat = this.srd_layerArr[3001].layer.getFeaturesByAttribute('Name',searchVal);
+				console.log("Create Feature for Job:"+jobNum+" in :"+searchVal);
+				if(theRefFeat && theRefFeat.length > 0) {
+					console.log("Adding Feature to Vector Layer!");
+					var theFeatureAttr = { 
+						label: cfs.cfs_code,
+						body : "Signal: "+cfs.cfs_code+" Job :"+cfs.cfs_num,
+						sr_status: "Open-Unassigned"
+						
+					};
+					var theFeat = new OpenLayers.Feature.Vector(theRefFeat[0].geometry,theFeatureAttr,null);
+					this.srd_layer.layer.addFeatures( Array( theFeat), {});
+				}
+			} else if(this.srd_selMapMode ==3) {
+				// USE Actual Address (if it was geocoded)
+//					console.log("Create Feature for Job:"+cfs.cfs_num);
+				var theFeatureAttr = { 
+					label: "10-"+cfs.cfs_code,
+					body : "Signal: 10-"+cfs.cfs_code+" Job :"+cfs.cfs_num,
+					cfs : cfs,
+					sr_status: "Open-Unassigned"
+				};
+				if( cfs.cfs_assignedunit) {
+					theFeatureAttr.sr_status = "Open-Assigned";
+				}
+				if ( cfs.cfs_finaldisdate ) {
+					theFeatureAttr.sr_status = "Closed";
+				}	
+
+				var theGeom = new OpenLayers.Geometry.fromWKT(cfs.geometry);
+				theGeom.transform(new OpenLayers.Projection("EPSG:4326"), new OpenLayers.Projection("EPSG:900913") );
+				var theFeat = new OpenLayers.Feature.Vector(theGeom,theFeatureAttr,null);
+				this.srd_layer.layer.addFeatures( Array( theFeat), {});
+//					console.log("Feature Geom ="+theFeat.geometry.toString());
+			}
+			}
+		},
+		// END addToMap
+		// BEGIN popupCfsSingle
+		popupCfsSingle: function(evt) {
+			var selectedItem = this.srd_datagrid.getItem(this.srd_datagrid.selection.selectedIndex);
+			var theDate = this.srd_datagrid.store.getValue( selectedItem, 'cfs_date' );
+			var theJobNum = this.srd_datagrid.store.getValue( selectedItem, 'cfs_num' );
+			console.log("popupCfsSingle CALLED: "+theDate+" ::: "+theJobNum);
+			var urlStr = '/cfssingle?cfs_date='+theDate+"&cfs_num="+theJobNum;
+//			var theWindow = window.open(urlStr,'Calls For Service - Single View','width=650px');	
+			
+			window.open(urlStr,'CallsForService','width=612,height='+screen.height+',resizeable=1');	
+
+		},
+		// END popupCfsSingle
+		// BEGIN changeQuery
+		changeQuery: function(theQueryId) {
+			console.log("Change Query to id:"+theQueryId);
+			this.data.srd_queryid = theQueryId;
+			this.srd_query = dojo.fromJson( this.srd_queryArr[theQueryId].data );
+			this.refreshTable();
+			this.srd_doc.updateLayoutNameDisplay();
+
+		},
+		// END changeQuery
+		// BEGIN getLabel
+		getLabel: function() {
+			console.log("Get Label Called!");
+			if(this.label) {
+				return this.label;
+			} else {
+				if(this.srd_queryArr && this.srd_queryArr[this.data.srd_queryid]) {
+					return this.srd_queryArr[this.data.srd_queryid].notes;
+				} else {
+					return '';
+				}
+			}
+		},
+		// END changeQuery
+		// BEGIN loadingComplete FUNCTION
+		loadingComplete : function() {
+			if(this.mapData) {
+				this.drawMapData();
+			}			
+		}	
+		// END loadingComplete FUNCTION
+
+
+
+	} );
+
+}  );
+
+
+
+
