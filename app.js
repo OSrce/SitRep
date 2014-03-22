@@ -28,36 +28,46 @@ app.configure(function() {
   app.use(app.router);
 });
 
+//TEMP USE Bookshelf
+  var Bookshelf  = require('bookshelf');
+  Bookshelf.PG = Bookshelf.initialize({
+    client: config.db.type,
+    connection: {
+         host : config.db.host,
+         user : config.db.user,
+         password : config.db.password,
+         charset : 'utf8'
+        }
+  } );
+//END TEMP
+
+
 //module style:
 //var db = require('./lib/db');
 var aaa = require('./lib/aaa');
+var User = require('./lib/User');
 
 
 //app.use(db);
 app.use(aaa);
+app.use(User);
 
+//User.forge({item: 'value'}).save();
 
 app.set('view engine', 'html');
 app.engine('html', hbs.__express);
 
-
-//app.get('/', function(req, res) {
-//  res.render('index');
-//});
-
 app.get('/',
-//       passport.authorize('base-auth', { failureRedirect: '/login' } )
-//        passport.authenticate('google',  { failureRedirect: '/login' } ),
-        aaa.ensureAuthenticated,
-        function(req, res) {
+  aaa.ensureAuthenticated,
+  function(req, res) {
 //             res.json({ id: req.user.id, username: req.user.username });
-            res.render('index');
-        }
+    res.render('template_index');
+  }
 );
 
 
 
-app.listen(3000);
+app.listen(config.web.port);
 
 
 
