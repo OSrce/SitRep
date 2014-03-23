@@ -132,6 +132,9 @@ define( 'srd/view/map', [
 
 				// IF start_base_layer is set to a valid baselayer we have, then we
 				// should start with that base layer being the one shown.
+			console.log("JR NEED TO FIX THIS ASAP");
+			this.data.start_base_layer=1002;
+//			console.dir(this);
 				if(this.data.start_base_layer && this.srd_layerArr[this.data.start_base_layer]) {
 					console.log("Loading Layer:"+this.srd_layerArr[this.data.start_base_layer].options.name+":::");
 					this.srd_layerArr[this.data.start_base_layer].loadData();

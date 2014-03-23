@@ -194,7 +194,7 @@ srd_init : function() {
 // load initial values and the first 'screen' we will see :
 // map, admin, or data.
 
-	console.log("Called srd_init!");
+	console.log("Called srd_init! (from srd_document)");
 	if(this.staticVals.runFromServer == null ) {
 		// LOCAL STORAGE LOADING
 		// LOAD THE VALUES AND CHECK TO SEE THAT WE HAVE EVERYTHING

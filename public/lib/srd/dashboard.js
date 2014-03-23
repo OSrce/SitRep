@@ -182,8 +182,9 @@ return declare( null, {
 // END ASSOCIATE DATA FROM SERVER
 
 
-	console.log("Called srd_init!");
+	console.log("Called srd_init! (from dashboard.js)");
 	if(this.staticVals.runFromServer == null ) {
+		console.log ("WTF remove this!");
 		// LOCAL STORAGE LOADING
 		// LOAD THE VALUES AND CHECK TO SEE THAT WE HAVE EVERYTHING
 		// WE NEED.  OTHERWISE, LOAD DEFAULTS FROM XML FILE.
@@ -205,6 +206,7 @@ return declare( null, {
 	} else if(this.staticVals.runFromServer == true) {
 //		console.log("this.staticVals.start_lat == "+this.staticVals.start_lat); 
 		this.staticVals.docCount = 1;
+		console.log ("WTF remove this - part2!");
 	}
 
 	/// TESTING UGLY JUST TO MAKE SURE selLayer isn't NULL.	
