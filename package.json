@@ -9,7 +9,8 @@
     "passport":"*",
     "passport-openid:"*",
     "passport-google":"*",
-    "pg":"*"
+    "pg":"*",
+    "bookshelf":"*"
 
   }
 }

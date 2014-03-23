@@ -29,10 +29,12 @@ app.configure(function() {
 });
 
 //TEMP USE Bookshelf
+/*
   var Bookshelf  = require('bookshelf');
   Bookshelf.PG = Bookshelf.initialize({
     client: config.db.type,
     connection: {
+				 database : config.db.database,
          host : config.db.host,
          user : config.db.user,
          password : config.db.password,
@@ -40,17 +42,17 @@ app.configure(function() {
         }
   } );
 //END TEMP
-
+*/
 
 //module style:
 //var db = require('./lib/db');
 var aaa = require('./lib/aaa');
-var User = require('./lib/User');
+//var User = require('./lib/User');
 
 
 //app.use(db);
 app.use(aaa);
-app.use(User);
+//app.use(User);
 
 //User.forge({item: 'value'}).save();
 
