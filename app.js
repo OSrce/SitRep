@@ -63,7 +63,7 @@ app.get('/',
   aaa.ensureAuthenticated,
   function(req, res) {
 //             res.json({ id: req.user.id, username: req.user.username });
-    res.render('template_index');
+    res.render('index');
   }
 );
 

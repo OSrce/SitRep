@@ -5,7 +5,7 @@
 define( [
 //	"srd/dojo_bootloader",
 	"dojo/_base/declare",
-	"srd/srd_rtc",
+//	"srd/srd_rtc",
 	"srd/srd_layer",
 	"srd/view/layertree",
 	"srd/srd_view",
@@ -28,7 +28,8 @@ define( [
 	"dijit/form/ComboBox",
 	"dojo/domReady!"
 //] , function( doc_include,  declare, srd_rtc, srd_layer, srd_view, srd_gridContainer  ) {
-] , function( declare, srd_rtc, srd_layer, view_layertree, srd_view, srd_gridContainer, Memory  ) {
+//] , function( declare, srd_rtc, srd_layer, view_layertree, srd_view, srd_gridContainer, Memory  ) {
+] , function( declare, srd_layer, view_layertree, srd_view, srd_gridContainer, Memory  ) {
 
 /*dojo.provide("ComboBoxReadStore");
 dojo.declare(

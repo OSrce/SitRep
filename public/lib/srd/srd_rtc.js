@@ -12,11 +12,13 @@
 define("srd/srd_rtc", [
 	"dojo/_base/declare",
 	"dojo/_base/unload",
-	"dojox/cometd/main",
+//	"dojox/cometd/main",
 	"dojo/domReady!"
-	], function( declare, unloader, cometd ) {
+//	], function( declare, unloader, cometd ) {
+	], function( declare, unloader ) {
 		return declare( 'srd_rtc', [] , {
 		// Pointer to parent srd_document class
+		cometd: {},
 		srd_doc : null,
 		connected : false,
 

@@ -5,7 +5,7 @@
 define( [
 //	"srd/dojo_bootloader",
 	"dojo/_base/declare",
-	"srd/srd_rtc",
+//	"srd/srd_rtc",
 	"srd/srd_layer",
 	"srd/view/menubar",
 	"srd/view/layertree",
@@ -16,10 +16,10 @@ define( [
 	"srd/dashboard",
 	"dojo/store/Memory",
 	"dojo/topic",
-    'coweb/main',
-    'coweb/ext/attendance',
-    'cowebx/dojo/ChatBox/ChatBox',
-	'cowebx/dojo/BusyDialog/BusyDialog',
+//    'coweb/main',
+//    'coweb/ext/attendance',
+//    'cowebx/dojo/ChatBox/ChatBox',
+//	'cowebx/dojo/BusyDialog/BusyDialog',
 	"srd/srd_view_map",
 	"srd/srd_view_cfssingle",
 	"srd/srd_view_admin",
@@ -37,7 +37,8 @@ define( [
 	"dijit/form/ComboBox",
 	"dojo/domReady!"
 //] , function( doc_include,  declare, srd_rtc, srd_layer, srd_view, srd_gridContainer  ) {
-] , function( declare, srd_rtc, srd_layer, view_menubar, view_layertree, view_map, view_grid, srd_view, srd_gridContainer, dashboard, Memory, topic, coweb,attendance,ChatBox, BusyDialog  ) {
+//] , function( declare, srd_rtc, srd_layer, view_menubar, view_layertree, view_map, view_grid, srd_view, srd_gridContainer, dashboard, Memory, topic, coweb,attendance,ChatBox, BusyDialog  ) {
+] , function( declare,  srd_layer, view_menubar, view_layertree, view_map, view_grid, srd_view, srd_gridContainer, dashboard, Memory, topic  ) {
 //dashboard_desktop CLASS 
 return declare( 'desktop', [dashboard], {
 
@@ -126,23 +127,25 @@ this.view_map = new view_map(map_data, this);
 	
 
 	// listen to remote events
+/*
 	this.collab = coweb.initCollab({id : 'dashboard'});
 	this.collab.subscribeReady(this, 'onCollabReady');
 	this.collab.subscribeSync('log.messageTEST', this, 'onRemoteLogMsg');
+*/
 
 //	this.collab.subscribeSync('log.message', this, 'onRemoteLogMsg');
 
 //	this.collab.subscribeSync('mod.zipvisits', this, "onZipVisits");
 
 	// get a session instance
-	this.session = coweb.initSession();
+//	this.session = coweb.initSession();
 //	BusyDialog.createBusy(this.session);
 
 	// do the prep using defaults
-	this.session.prepare({ key:"sitrep"});
+//	this.session.prepare({ key:"sitrep"});
 
 	// Register the alerting routine with the "alertUser" topic.
-    topic.subscribe("updateSession", function(args){
+/*    topic.subscribe("updateSession", function(args){
     	console.log("updateSession called:"+ this.session._bridge.getState() );
     	//this.session.update();
     	//this.session.updateInSession();
@@ -153,7 +156,7 @@ this.view_map = new view_map(map_data, this);
   //      }.bind(this) );
     }.bind(this) );
 	
-	
+*/	
 		
 	},
 	//BEGIN setWindowLayout

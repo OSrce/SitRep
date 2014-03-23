@@ -14,9 +14,10 @@ define([
 	"srd/ol/protocol",
 	"srd/ol/cluster",
 	"dojo/topic",
-	"coweb/main",
+//	"coweb/main",
 	"dojox/timing/Sequence"
-], function(declare , srd_editPalette, Format, Protocol, Cluster, topic, coweb ) {
+//], function(declare , srd_editPalette, Format, Protocol, Cluster, topic, coweb ) {
+], function(declare , srd_editPalette, Format, Protocol, Cluster, topic ) {
 //OpenLayers.ProxyHost = "/cgi-bin/proxy.cgi?url=";
 
 return declare( [], {
@@ -1611,8 +1612,8 @@ startRealtimeService : function() {
 		this.realtimeService = true;
 		console.log("startRealtimeService Called for layer:"+this.id);
 		var args = { id: this.id };
-		this.collab = coweb.initCollab( {id : 'layer.' + this.id } );
-		this.collab.subscribeReady(this, 'onCollabReady');
+//		this.collab = coweb.initCollab( {id : 'layer.' + this.id } );
+//		this.collab.subscribeReady(this, 'onCollabReady');
 		this.options.srd_doc.collab.postService("layer", args, this, "onLayerSubscribed" );
 	} else {
 		console.log("startRealtimeService Called but already running for layer:"+this.id);
