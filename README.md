@@ -1,7 +1,7 @@
 
 # SitRep
 
-Copyright (c) 2010-2013, OSrce LLC
+Copyright (c) 2010-2014, OSrce LLC
 
 SitRep is a web-based system designed planning, operations, and analysis of public safety data.
 SitRep is made available under a BSD-license. Please see LICENSE in this distribution for more details.

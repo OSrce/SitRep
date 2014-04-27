@@ -7,7 +7,7 @@ config.siteUrl = 'localhost';
 
 config.web = {};
 config.web.useSSL = false; // true or false;
-config.web.port = process.env.WEB_PORT || 3000;
+config.web.port = process.env.WEB_PORT || 8080;
 
 config.web.baseUrl = '';
 if( config.web.useSSL == true) {
